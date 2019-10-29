@@ -1,0 +1,10 @@
+* text eol=lf
+* text eol=lf
+*.pdf binary
+*.png binary
+*.ods binary
+*.psdata binary
+*.zip binary
+*.pyc binary
+*.o binary
+*.vpi binary

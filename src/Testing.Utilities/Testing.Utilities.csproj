@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Lophtware.Testing.Utilities</AssemblyName>
+    <RootNamespace>Lophtware.Testing.Utilities</RootNamespace>
+    <Authors>Pete Restall</Authors>
+    <Company>Lophtware</Company>
+    <Description>Various collections of utilities that have been found to be useful ('common') during unit and integration testing across various projects.</Description>
+    <Copyright>(C) Pete Restall 2019 &lt;pete@restall.net&gt;</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>www.lophtware.co.uk</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lophtware/Testing.Utilities/</RepositoryUrl>
+    <PackageTags>lophtware testing utilities</PackageTags>
+    <PackageIconUrl></PackageIconUrl>
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.0</VersionPrefix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">local</VersionSuffix>
+    <NoWarn>NU5105</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
