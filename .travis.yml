@@ -1,7 +1,7 @@
 sudo: required
 env:
   global:
-    - VERSION="1.0.1"
+    - VERSION="1.0.2"
     - VERSION_WITH_BUILD="$VERSION.$TRAVIS_BUILD_NUMBER"
     - SOLUTION="src/Testing.Utilities.sln"
 
