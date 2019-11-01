@@ -1,7 +1,7 @@
 sudo: required
 env:
   global:
-    - VERSION="1.0.2"
+    - VERSION="1.0.3"
     - VERSION_WITH_BUILD="$VERSION.$TRAVIS_BUILD_NUMBER"
     - SOLUTION="src/Testing.Utilities.sln"
 
@@ -12,13 +12,14 @@ matrix:
         - PRE_RELEASE="" VERSION_WITH_SUFFIX="$VERSION"
     - if: (branch != master) OR (repo =~ /\.private$/)
       env:
-        - PRE_RELEASE="-ci.$TRAVIS_BUILD_NUMBER" VERSION_WITH_SUFFIX="$VERSION$PRE_RELEASE"
+        - PRE_RELEASE="ci.$TRAVIS_BUILD_NUMBER" VERSION_WITH_SUFFIX="$VERSION-$PRE_RELEASE"
 
 language: csharp
 mono: none
 dotnet: 3.0
 
 script:
+  - set -e
   - dotnet restore "$SOLUTION"
   - dotnet build "$SOLUTION" -c Release -p:VersionPrefix="$VERSION" -p:VersionSuffix="$PRE_RELEASE" -p:AssemblyVersion="$VERSION_WITH_BUILD" -p:FileVersion="$VERSION_WITH_BUILD" -p:InformationalVersion="$VERSION_WITH_SUFFIX"
   - dotnet pack "$SOLUTION" -c Release --include-symbols --no-build -p:SymbolPackageFormat=snupkg -p:Version="$VERSION_WITH_SUFFIX"
