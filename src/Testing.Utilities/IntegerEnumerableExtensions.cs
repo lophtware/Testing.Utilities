@@ -12,7 +12,8 @@ namespace Lophtware.Testing.Utilities
 			return count.Select(_ => createItem());
 		}
 
-		private static IEnumerable<T> Select<T>(this int count, Func<int, T> createItem)
+		[SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = CodeAnalysisJustification.PublishedApi)]
+		public static IEnumerable<T> Select<T>(this int count, Func<int, T> createItem)
 		{
 			for (var i = 0; i < count; i++)
 				yield return createItem(i);
