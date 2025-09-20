@@ -28,8 +28,9 @@ namespace Lophtware.Testing.Utilities.NonDeterminism.PrimitiveGeneration
 			if (min >= halfOpenMax)
 				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be less than maximum");
 
+			var halfOpenMaxLimit = halfOpenMax <= decimal.MinValue ? decimal.MinValue : halfOpenMax - Epsilon;
 			var fraction = (decimal) Random.Generator.NextDouble();
-			return decimal.Max(min, decimal.Min(halfOpenMax - Epsilon, min + (halfOpenMax - min) * fraction));
+			return decimal.Max(min, decimal.Min(halfOpenMaxLimit, min + (halfOpenMax - min) * fraction));
 		}
 
 		public static decimal AnyPositive() => WithinInclusiveRange(0, decimal.MaxValue);
