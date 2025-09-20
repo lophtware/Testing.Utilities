@@ -2,13 +2,9 @@
 using System.Linq;
 using Lophtware.Testing.Utilities.NonDeterminism.PrimitiveGeneration;
 
-namespace Lophtware.Testing.Utilities.NonDeterminism
+namespace Lophtware.Testing.Utilities.NonDeterminism;
+
+public static class EnumerableShuffleExtensions
 {
-	public static class EnumerableShuffleExtensions
-	{
-		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items)
-		{
-			return items.OrderBy(_ => IntegerGenerator.Any());
-		}
-	}
+	public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items) => items.OrderBy(_ => IntegerGenerator.Any());
 }
