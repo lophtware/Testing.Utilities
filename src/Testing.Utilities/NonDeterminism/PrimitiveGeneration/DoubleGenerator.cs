@@ -1,47 +1,54 @@
 ﻿using System;
+using System.Linq;
 
 namespace Lophtware.Testing.Utilities.NonDeterminism.PrimitiveGeneration
 {
-    public class DoubleGenerator
-    {
-        public static double Any()
-        {
-            return Random.Generator.NextDouble();
-        }
+	public class DoubleGenerator
+	{
+		private static readonly double Epsilon = double.Epsilon;
 
-        public static double WithinExclusiveRange(double min, double max)
-        {
-            if (min >= max) throw new ArgumentException("min must be less than max");
-            return min + (max - min) * Random.Generator.NextDouble();
-        }
+		public static double Any() => WithinInclusiveRange(double.MinValue, double.MaxValue);
 
-        public static double WithinInclusiveRange(double min, double max)
-        {
-            if (min > max) throw new ArgumentException("min must be less than or equal to max");
-            if (double.IsPositiveInfinity(max))
-            {
-                // fallback if you want to cap to double.MaxValue
-                max = double.MaxValue;
-            }
-            return WithinExclusiveRange(min, BitConverter.Int64BitsToDouble(BitConverter.DoubleToInt64Bits(max) + 1));
-        }
+		public static double WithinInclusiveRange(double min, double max)
+		{
+			if (!double.IsFinite(min))
+				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be a finite value");
 
-        public static double AnyPositive()
-        {
-            return WithinInclusiveRange(0.0, double.MaxValue);
-        }
+			if (!double.IsFinite(max))
+				throw new ArgumentOutOfRangeException(nameof(max), max, "Maximum must be a finite value");
 
-        public static double AnyNegative()
-        {
-            return WithinInclusiveRange(double.MinValue, -double.Epsilon);
-        }
+			if (min > max)
+				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be less than or equal to maximum");
 
-        public static double NonZero()
-        {
-            // 50% chance negative, 50% chance positive
-            return Random.Generator.Next(2) == 0
-                ? AnyNegative()
-                : AnyPositive();
-        }
-    }
+			if (max >= double.MaxValue)
+			{
+				var shim = Random.Generator.NextDouble() > 0.99 ? Epsilon : 0;
+				return double.Min(max, WithinExclusiveRange(min, max) + shim);
+			}
+			else
+				return double.Min(max, WithinExclusiveRange(min, max + Epsilon));
+		}
+
+		public static double WithinExclusiveRange(double min, double halfOpenMax)
+		{
+			if (min >= halfOpenMax)
+				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be less than maximum");
+
+			var halfOpenMaxLimit = halfOpenMax <= double.MinValue ? double.MinValue : halfOpenMax - Epsilon;
+			var fraction = Random.Generator.NextDouble();
+			return double.Max(min, double.Min(halfOpenMaxLimit, min + (halfOpenMax - min) * fraction));
+		}
+
+		public static double AnyPositive() => WithinInclusiveRange(0, double.MaxValue);
+
+		public static double AnyNegative() => WithinExclusiveRange(double.MinValue, 0);
+
+		public static double AnyNonZero() => AnyExceptExact(double.NegativeZero, 0);
+
+		public static double AnyExceptExact(params double[] except)
+		{
+			var value = Any();
+			return except.All(x => x != value) ? value : AnyExceptExact(except);
+		}
+	}
 }
