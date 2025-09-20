@@ -1,45 +1,47 @@
 ﻿using System;
+using System.Linq;
 
 namespace Lophtware.Testing.Utilities.NonDeterminism.PrimitiveGeneration
 {
-    public class DecimalGenerator
-    {
-        public static decimal Any()
-        {
-            // produces [0.0, 1.0)
-            return (decimal)Random.Generator.NextDouble();
-        }
+	public class DecimalGenerator
+	{
+		private static readonly decimal Epsilon = new(double.Epsilon);
 
-        public static decimal WithinExclusiveRange(decimal min, decimal max)
-        {
-            if (min >= max) throw new ArgumentException("min must be less than max");
+		public static decimal Any() => WithinInclusiveRange(decimal.MinValue, decimal.MaxValue);
 
-            // generate a decimal in [0,1)
-            decimal fraction = (decimal)Random.Generator.NextDouble();
-            return min + (max - min) * fraction;
-        }
+		public static decimal WithinInclusiveRange(decimal min, decimal max)
+		{
+			if (min > max)
+				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be less than or equal to maximum");
 
-        public static decimal WithinInclusiveRange(decimal min, decimal max)
-        {
-            if (min > max) throw new ArgumentException("min must be less than or equal to max");
-            return WithinExclusiveRange(min, max + (decimal)double.Epsilon);
-        }
+			if (max == decimal.MaxValue)
+			{
+				var shim = Random.Generator.NextDouble() > 0.99 ? Epsilon : 0;
+				return decimal.Min(max, WithinExclusiveRange(min, max) + shim);
+			}
+			else
+				return decimal.Min(max, WithinExclusiveRange(min, max + Epsilon));
+		}
 
-        public static decimal AnyPositive()
-        {
-            return WithinInclusiveRange(0m, decimal.MaxValue);
-        }
+		public static decimal WithinExclusiveRange(decimal min, decimal halfOpenMax)
+		{
+			if (min >= halfOpenMax)
+				throw new ArgumentOutOfRangeException(nameof(min), min, "Minimum must be less than maximum");
 
-        public static decimal AnyNegative()
-        {
-            return WithinInclusiveRange(decimal.MinValue, -(decimal)double.Epsilon);
-        }
+			var fraction = (decimal) Random.Generator.NextDouble();
+			return decimal.Max(min, decimal.Min(halfOpenMax - Epsilon, min + (halfOpenMax - min) * fraction));
+		}
 
-        public static decimal NonZero()
-        {
-            return Random.Generator.Next(2) == 0
-                ? AnyNegative()
-                : AnyPositive();
-        }
-    }
+		public static decimal AnyPositive() => WithinInclusiveRange(0, decimal.MaxValue);
+
+		public static decimal AnyNegative() => WithinExclusiveRange(decimal.MinValue, 0);
+
+		public static decimal AnyNonZero() => AnyExcept(0);
+
+		public static decimal AnyExcept(params decimal[] except)
+		{
+			var value = Any();
+			return except.All(x => x != value) ? value : AnyExcept(except);
+		}
+	}
 }
